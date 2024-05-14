@@ -1,0 +1,17 @@
+{
+    "name": "ghivarra/native-php-dynamic-image",
+    "description": "Dynamic Image Resizer using Native PHP",
+    "type": "library",
+    "license": "GNU-GPLv2",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Ghivarra Senandika Rushdie"
+        }
+    ],
+    "require": {}
+}
