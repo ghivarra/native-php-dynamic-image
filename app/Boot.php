@@ -13,6 +13,8 @@
  *
 **/
 
+use \Imagick as Imagick;
+
 class Boot
 {
     private function badRequest(string $message = 'Error 400 - Bad Request'): string
@@ -57,7 +59,23 @@ class Boot
 
     //=========================================================================================
 
-    private function resize(string $originalPath, string $options, string $extension)
+    private function print(string $imagePath): string
+    {
+        $mime = mime_content_type($imagePath);
+        $size = filesize($imagePath);
+
+        header("Cache-Control: max-age=31536000, immutable");
+        header("Vary: Accept-Encoding");
+        header("Content-Type: {$mime}");
+        header("Content-Length: {$size}");
+
+        // return
+        return file_get_contents($imagePath);
+    }
+
+    //=========================================================================================
+
+    private function resize(string $originalPath, string $targetPath, string $options, string $extension): string
     {
         $options = str_replace(['--resized-', ".{$extension}"], '', $options);
         $options = explode('-', $options);
@@ -93,11 +111,41 @@ class Boot
 
         endforeach;
 
-        // resize image
-        
+        // manipulation set
+        $set['width']  = ($set['constraint'] === 'width') ? $set['width'] : 0;
+        $set['height'] = ($set['constraint'] === 'height') ? $set['height'] : 0;
 
-        // prettyPrint($_SERVER);
-        echo round((memory_get_peak_usage() * 0.0000001), 3) . ' mb';
+        // resize image
+        $image = new Imagick($originalPath);
+
+        if ($set['constraint'] === 'forced')
+        {
+            $image->resizeImage($set['width'], $set['height'], Imagick::FILTER_CATROM, 0.5, false);
+
+        } else {
+
+            $image->thumbnailImage($set['width'], $set['height']);
+        }
+        
+        $fileName     = substr(strrchr($targetPath, '/'), 1);
+        $targetFolder = substr($targetPath, 0, (strlen($targetPath) - strlen($fileName)));
+
+        // check if folder exist and create if not exist
+        if(!file_exists($targetFolder) OR !is_dir($targetFolder))
+        {
+            mkdir($targetFolder, 0755, true);
+        }
+
+        // save file
+        if ($extension === 'gif')
+        {
+            file_put_contents($targetPath, $image->getImagesBlob());
+        } else {
+            file_put_contents($targetPath, $image->getImageBlob());
+        }
+
+        // print image
+        return $this->print($targetPath);
     }
 
     //=========================================================================================
@@ -143,6 +191,7 @@ class Boot
         // search file
         $options      = strstr($path, '--resized-');
         $originalPath = RESOURCEPATH . substr($path, 0, (strlen($path) - strlen($options))) . ".{$extension}";
+        $targetPath   = PUBLICPATH . 'dist/' . $path;
 
         if (!file_exists($originalPath))
         {
@@ -150,7 +199,7 @@ class Boot
         }
 
         // run resize
-        return $this->resize($originalPath, $options, $extension);
+        return $this->resize($originalPath, $targetPath, $options, $extension);
     }
 
     //=========================================================================================
