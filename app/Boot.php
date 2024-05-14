@@ -84,11 +84,35 @@ class Boot
         $config = new Config();
 
         // set
-        $set = [
-            'width'      => isset($options[0]) ? intval(substr($options[0], 1)) : $config->defaultWidth,
-            'height'     => isset($options[1]) ? intval(substr($options[1], 1)) : $config->defaultHeight,
-            'constraint' => isset($options[2]) ? substr($options[2], 1) : $config->defaultConstraint,
-        ];
+        foreach ($options as $option):
+
+            $firstLetter = substr($option, 0, 1);
+
+            if (!$firstLetter)
+            {
+                continue;
+            }
+
+            switch ($firstLetter) {
+                case 'w':
+                    $set['width'] = intval(substr($option, 1));
+                    break;
+
+                case 'h':
+                    $set['height'] = intval(substr($option, 1));
+                    break;
+                
+                case 'c':
+                    $set['constraint'] = intval(substr($option, 1));
+                    break;
+            }
+
+        endforeach;
+        
+        // recheck set
+        $set['width']      = isset($set['width']) ? $set['width'] : $config->defaultWidth;
+        $set['height']     = isset($set['height']) ? $set['height'] : $config->defaultHeight;
+        $set['constraint'] = isset($set['constraint']) ? $set['constraint'] : $config->defaultConstraint;
 
         // set allowed
         $allowed = [
