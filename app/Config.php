@@ -24,6 +24,6 @@ class Config
     public $dedaultConstraint = 'width'; // width, height, or forced
     
     // Allowed Settings, default settings is always allowed
-    public $allowedHeight = [ 1366 ];
     public $allowedWidth = [ 1366 ];
+    public $allowedHeight = [ 1366 ];
 }
