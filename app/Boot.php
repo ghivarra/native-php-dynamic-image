@@ -15,6 +15,14 @@
 
 class Boot
 {
+    private function badRequest(string $message = 'Error 400 - Bad Request'): string
+    {
+        header('HTTP/1.1 400 Bad Request', true, 400);
+        return htmlspecialchars($message);
+    }
+
+    //=========================================================================================
+
     private function getCleanPath(): string
     {
         // break down url/path and delete the first slash
@@ -49,10 +57,47 @@ class Boot
 
     //=========================================================================================
 
-    private function badRequest($message = 'Error 400 - Bad Request'): string
+    private function resize(string $originalPath, string $options, string $extension)
     {
-        header('HTTP/1.1 400 Bad Request', true, 400);
-        return $message;
+        $options = str_replace(['--resized-', ".{$extension}"], '', $options);
+        $options = explode('-', $options);
+
+        // config
+        $config = new Config();
+
+        // set
+        $set = [
+            'width'      => isset($options[0]) ? intval(substr($options[0], 1)) : $config->defaultWidth,
+            'height'     => isset($options[1]) ? intval(substr($options[1], 1)) : $config->defaultHeight,
+            'constraint' => isset($options[2]) ? substr($options[2], 1) : $config->defaultConstraint,
+        ];
+
+        // set allowed
+        $allowed = [
+            'height'     => $config->allowedHeight,
+            'width'      => $config->allowedWidth,
+            'constraint' => ['width', 'height', 'forced'],
+        ];
+
+        array_push($allowed['width'], $config->defaultWidth);
+        array_push($allowed['height'], $config->defaultHeight);
+
+        // validate options
+        foreach ($set as $key => $value):
+
+            if(!in_array($value, $allowed[$key]))
+            {
+                $keyTitle = ucwords($key);
+                return $this->badRequest("{$keyTitle} is not allowed in configurations.");
+            }
+
+        endforeach;
+
+        // resize image
+        
+
+        // prettyPrint($_SERVER);
+        echo round((memory_get_peak_usage() * 0.0000001), 3) . ' mb';
     }
 
     //=========================================================================================
@@ -79,37 +124,33 @@ class Boot
         $path = substr($path, strlen('dist/'));
 
         // get requested image data
-        $ext = substr(strrchr($path, '.'), 1);
+        $extension = substr(strrchr($path, '.'), 1);
 
-        if (!$ext)
+        if (!$extension)
         {
             return $this->badRequest('File needed to have extensions.');
         }
 
         // new config
-        $ext    = strtolower($ext);
-        $config = new Config();
+        $extension = strtolower($extension);
+        $config    = new Config();
 
-        if (!in_array($ext, $config->allowedExtension))
+        if (!in_array($extension, $config->allowedExtension))
         {
             return $this->badRequest('File format is not supported.');
         }
 
         // search file
-        $settings     = strstr($path, '--resized-');
-        $originalPath = substr($path, 0, (strlen($path) - strlen($settings))) . ".{$ext}";
+        $options      = strstr($path, '--resized-');
+        $originalPath = RESOURCEPATH . substr($path, 0, (strlen($path) - strlen($options))) . ".{$extension}";
 
-        if (!file_exists(RESOURCEPATH . $originalPath))
+        if (!file_exists($originalPath))
         {
             return $this->badRequest('File not found.');
         }
-        
-        prettyPrint($originalPath);
 
-        // prettyPrint($config->allowedExtension);
-
-        // prettyPrint($_SERVER);
-        echo round((memory_get_peak_usage() * 0.0000001), 3) . ' mb';
+        // run resize
+        return $this->resize($originalPath, $options, $extension);
     }
 
     //=========================================================================================
