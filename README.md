@@ -30,19 +30,25 @@ You can set your preferred height for the image on this option. You can set the 
 File is located in app\Config.php
 
 ### allowedExtension
-Store your allowed image extensions on this option. __format: Array__
+Store your allowed image extensions on this option. 
+__format: Array__
 
 ### defaultWidth
-Set your default width on this option. __format: Integer__
+Set your default width on this option. 
+__format: Integer__
 
 ### defaultHeight
-Set your default height on this option. __format: Integer__
+Set your default height on this option. 
+__format: Integer__
 
 ### defaultConstraint
-Set your constraint (width, height, or forced) on this option. __format: String__
+Set your constraint (width, height, or forced) on this option. 
+__format: String__
 
 ### allowedWidth
-Store your allowed width on this option. __format: Array__
+Store your allowed width on this option. 
+__format: Array__
 
 ### allowedHeight
-Store your allowed height on this option. __format: Array__
+Store your allowed height on this option. 
+__format: Array__
