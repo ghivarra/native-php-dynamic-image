@@ -111,20 +111,20 @@ class Boot
 
         endforeach;
 
-        // manipulation set
-        $set['width']  = ($set['constraint'] === 'width') ? $set['width'] : 0;
-        $set['height'] = ($set['constraint'] === 'height') ? $set['height'] : 0;
-
         // resize image
         $image = new Imagick($originalPath);
 
         if ($set['constraint'] === 'forced')
         {
-            $image->resizeImage($set['width'], $set['height'], Imagick::FILTER_CATROM, 0.5, false);
+            $image->resizeImage($set['width'], $set['height'], Imagick::FILTER_GAUSSIAN, 0.5, false);
 
         } else {
 
-            $image->thumbnailImage($set['width'], $set['height']);
+            // manipulate set data
+            $set['width']  = ($set['constraint'] === 'width') ? $set['width'] : 0;
+            $set['height'] = ($set['constraint'] === 'height') ? $set['height'] : 0;
+
+            $image->scaleImage($set['width'], $set['height']);
         }
         
         $fileName     = substr(strrchr($targetPath, '/'), 1);
@@ -140,9 +140,14 @@ class Boot
         if ($extension === 'gif')
         {
             file_put_contents($targetPath, $image->getImagesBlob());
+
         } else {
+
             file_put_contents($targetPath, $image->getImageBlob());
         }
+
+        // destroy imagick instance
+        $image->destroy();
 
         // print image
         return $this->print($targetPath);
