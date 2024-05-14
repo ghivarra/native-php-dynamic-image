@@ -19,8 +19,8 @@ class Config
     public $allowedExtension = ['png', 'jpg', 'gif', 'tiff', 'webp', 'svg'];
 
     // Default Settings
-    public $defaultHeight = 450;
     public $defaultWidth = 450;
+    public $defaultHeight = 450;
     public $dedaultConstraint = 'width'; // width, height, or forced
     
     // Allowed Settings, default settings is always allowed
