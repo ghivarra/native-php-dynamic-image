@@ -1,7 +1,7 @@
 <?php
 
 // Check PHP versions
-$acceptedPHPVersion = '8.3';
+$acceptedPHPVersion = '7.4';
 
 if (PHP_VERSION < $acceptedPHPVersion)
 {
