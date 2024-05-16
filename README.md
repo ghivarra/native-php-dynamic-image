@@ -1,7 +1,7 @@
 # Native PHP Dynamic Resizing Image
 Dynamic Resizing Image using Native PHP + ImageMagick, No other dependency needed as I keep it as minimal as possible.
 
-- Tested on PHP 8.3 with Imagick 3.7.0
+- Tested on PHP 7.4 and higher with Imagick
 
 ## Basic Example
 For example, you wanted to dynamic resize image named **logo.jpg** with specific size such as: **width = 100px** and **height = 72px** with **non-constraint scaling** or forced resizing so the image is exactly on that specific size.
