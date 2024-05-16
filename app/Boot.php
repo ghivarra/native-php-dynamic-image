@@ -103,7 +103,7 @@ class Boot
                     break;
                 
                 case 'c':
-                    $set['constraint'] = intval(substr($option, 1));
+                    $set['constraint'] = substr($option, 1);
                     break;
             }
 
