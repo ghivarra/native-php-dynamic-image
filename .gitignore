@@ -14,11 +14,13 @@ Homestead.json
 # Image resources folder
 #-------------------------
 /resources/*
+!/resources/.gitignore
 
 #-------------------------
 # Image result folder
 #-------------------------
 /public/dist/*
+!/public/dist/.gitinore
 
 # OS X
 .DS_Store
