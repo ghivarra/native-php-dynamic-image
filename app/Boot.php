@@ -156,7 +156,7 @@ class Boot
 
             } else {
 
-                $sizeOption = ($set['constraint'] === 'width') ? "-w ${$set['width']}" : "-h ${$set['height']}";
+                $sizeOption = ($set['constraint'] === 'width') ? "-w {$set['width']}" : "-h {$set['height']}";
                 shell_exec("rsvg-convert {$originalPath} -a {$sizeOption} -f svg -o {$targetPath}");
             }
 
