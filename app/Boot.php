@@ -171,7 +171,7 @@ class Boot
         }
 
         // destroy imagick instance
-        $image->destroy();
+        $image->clear();
 
         // print image
         return $this->print($targetPath);
