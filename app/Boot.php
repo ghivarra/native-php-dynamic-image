@@ -130,27 +130,11 @@ class Boot
             if(!in_array($value, $allowed[$key]))
             {
                 $keyTitle = ucwords($key);
-                return $this->badRequest("{$keyTitle} is not allowed in configurations.");
+                return $this->badRequest("{$keyTitle} {$value} is not allowed in configurations.");
             }
 
         endforeach;
 
-        // resize image
-        $image = new Imagick($originalPath);
-
-        if ($set['constraint'] === 'forced')
-        {
-            $image->resizeImage($set['width'], $set['height'], Imagick::FILTER_GAUSSIAN, 0.5, false);
-
-        } else {
-
-            // manipulate set data
-            $set['width']  = ($set['constraint'] === 'width') ? $set['width'] : 0;
-            $set['height'] = ($set['constraint'] === 'height') ? $set['height'] : 0;
-
-            $image->scaleImage($set['width'], $set['height']);
-        }
-        
         $fileName     = substr(strrchr($targetPath, '/'), 1);
         $targetFolder = substr($targetPath, 0, (strlen($targetPath) - strlen($fileName)));
 
@@ -160,18 +144,44 @@ class Boot
             mkdir($targetFolder, 0755, true);
         }
 
-        // save file
-        if ($extension === 'gif')
+        // Windows server function normally but for some reason Linux Server cannot load svg file in imagick
+        // so we use shell_exec / exec
+        // need librsvg2-bin, and exec must be enabled
+        if (strtolower($extension) === 'svg' && (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN'))
         {
-            file_put_contents($targetPath, $image->getImagesBlob());
+            // convert size
+            if ($set['constraint'] === 'forced')
+            {
+                shell_exec("rsvg-convert {$originalPath} -w {$set['width']} -h {$set['height']} -f svg -o {$targetPath}");
+
+            } else {
+
+                $sizeOption = ($set['constraint'] === 'width') ? "-w ${$set['width']}" : "-h ${$set['height']}";
+                shell_exec("rsvg-convert {$originalPath} -a {$sizeOption} -f svg -o {$targetPath}");
+            }
 
         } else {
-
-            file_put_contents($targetPath, $image->getImageBlob());
+            
+            // resize image
+            $image = new ImageMagick();
+            $image->readImage($originalPath);
+    
+            if ($set['constraint'] === 'forced')
+            {
+                $resize = $image->resizeImage($set['width'], $set['height'], ImageMagick::FILTER_GAUSSIAN, 0.5, false);
+    
+            } else {
+    
+                // manipulate set data
+                $set['width']  = ($set['constraint'] === 'width') ? $set['width'] : 0;
+                $set['height'] = ($set['constraint'] === 'height') ? $set['height'] : 0;
+    
+                $resize = $image->scaleImage($set['width'], $set['height']);
+            }
+    
+            // destroy imagick instance
+            $image->clear();
         }
-
-        // destroy imagick instance
-        $image->clear();
 
         // print image
         return $this->print($targetPath);
