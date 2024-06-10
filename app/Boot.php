@@ -185,6 +185,20 @@ class Boot
         require_once APPPATH . 'Common.php';
         require_once APPPATH . 'Config.php';
 
+        // set environment
+        $config = new Config();
+
+        if ($config->env == 'development')
+        {
+            error_reporting(E_ALL);
+            ini_set("display_errors", 1);
+
+        } elseif ($config->env == 'production') {
+
+            error_reporting(0);
+            ini_set("display_errors", 0);
+        }
+
         // check method, if not get and options for ajax purposes then GTFOH
         if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $_SERVER['REQUEST_METHOD'] !== 'OPTIONS')
         {
@@ -210,7 +224,6 @@ class Boot
 
         // new config
         $extension = strtolower($extension);
-        $config    = new Config();
 
         if (!in_array($extension, $config->allowedExtension))
         {

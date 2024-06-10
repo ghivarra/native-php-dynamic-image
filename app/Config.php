@@ -15,6 +15,9 @@
 
 class Config
 {
+    // set Environment
+    public $env = 'production';
+
     // Allowed Extensions
     public $allowedExtension = ['png', 'jpg', 'gif', 'tiff', 'webp', 'svg'];
 
