@@ -21,7 +21,7 @@ class Config
     // Default Settings
     public $defaultWidth = 450;
     public $defaultHeight = 450;
-    public $dedaultConstraint = 'width'; // width, height, or forced
+    public $defaultConstraint = 'width'; // width, height, or forced
     
     // Allowed Settings, default settings is always allowed
     public $allowedWidth = [ 1366 ];
